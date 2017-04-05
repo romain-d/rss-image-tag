@@ -1,0 +1,44 @@
+<?php
+/*
+  Plugin Name: RSS Image Tag
+  Plugin URI: https://romaindorr.fr
+  Description: Add a RSS tag "image" if post has thumbnail
+  Author: Romain DORR
+  Author URI: https://romaindorr.fr
+  Version: 1.0
+
+  ----
+  Copyright 2017 - Romain DORR (contact@romaindorr.fr)
+  ----
+ */
+class RSS_Image_Tag {
+
+    public function __construct() {
+        add_action( 'rss_item', array( __CLASS__, 'add_thumbnail_to_rss' ) );
+        add_action( 'rss2_item', array( __CLASS__, 'add_thumbnail_to_rss' ) );
+    }
+
+    public static function add_thumbnail_to_rss() {
+        global $post;
+
+        $image = '';
+
+        if ( has_post_thumbnail( $post ) ) {
+            $thumbnail_id = get_post_thumbnail_id( $post );
+
+            if ( empty ( $thumbnail_id ) ) {
+                return $image;
+            }
+
+            $image .= '<image>';
+                $image .= '<url>' . wp_get_attachment_url( $thumbnail_id ) . '</url>';
+                $image .= '<title>' . get_the_title( $thumbnail_id ) . '</title>';
+                $image .= '<link>' . home_url( '/' ) . '</link>';
+            $image .= '</image>';
+        }
+
+        echo $image;
+    }
+}
+
+new RSS_Image_Tag();
